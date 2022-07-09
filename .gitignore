@@ -128,4 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
+# Ignore Django stuff
 migrations/
+images/
