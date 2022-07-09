@@ -2,18 +2,15 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from utils import allow_methods
 
 from .models import UserInfo
 
 
 # Create your views here.
+@allow_methods(['POST'])
 def login_request(request):
     """Login user"""
-    if request.method != 'POST':
-        return JsonResponse(
-            {'error': 'Method not allowed'},
-            status=405
-        )
     post_dict = request.POST
     username = post_dict.get('username')
     password = post_dict.get('password')
@@ -25,6 +22,7 @@ def login_request(request):
     return JsonResponse({'success': True})
 
 
+@allow_methods(['POST'])
 def logout_request(request):
     logout(request)
     return JsonResponse({'success': True})
@@ -57,13 +55,9 @@ def _add_user(username, password, gender, dob, mobile_number, nok, religion, nat
     return user
 
 
+@allow_methods(['POST'])
 def signup(request):
     """User Signup for django"""
-    if request.method != 'POST':
-        return JsonResponse(
-            {'error': 'Method not allowed'},
-            status=405
-        )
     user = _add_user(**dict(request.POST.items()))
     if user is None:
         return JsonResponse({'error': 'Username already exists'}, status=409)

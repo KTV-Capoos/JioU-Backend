@@ -2,13 +2,13 @@ import datetime
 from django.http import JsonResponse
 
 from .models import Event
-from utils import login_required
-
+from utils import login_required, allow_methods
 
 
 # Create your views here.
 @login_required
-def all_event(request):
+@allow_methods(['GET'])
+def all_event(_):
     """Get all events"""
     future_events = Event.objects.filter(
         event_date__gte=datetime.date.today() - datetime.timedelta(days=3)
@@ -26,7 +26,8 @@ def all_event(request):
 
 
 @login_required
-def event_detail(request, event_id):
+@allow_methods(['GET'])
+def event_detail(_, event_id):
     """Get event detail"""
     try:
         event = Event.objects.get(event_id=event_id)
