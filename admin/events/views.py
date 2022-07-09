@@ -31,12 +31,13 @@ def event_detail(_, event_id):
     """Get event detail"""
     try:
         event = Event.objects.get(event_id=event_id)
-        return JsonResponse(
-            event.toDict(),
-            safe=False,
-        )
     except Event.DoesNotExist:
         return JsonResponse(
             {'error': 'Event not found'},
             status=404
+        )
+    else:
+        return JsonResponse(
+            event.toDict(),
+            safe=False,
         )
