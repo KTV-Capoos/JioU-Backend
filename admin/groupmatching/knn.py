@@ -2,31 +2,37 @@ from sklearn.cluster import KMeans
 import numpy as np
 from itertools import cycle
 
-import django
-import matplotlib.pyplot as plt
-import time
-
 
 def calc_distance(x1, y1, a, b, c):
-    return np.abs((a * x1 + b * y1 + c )) / np.sqrt(a**2 + b ** 2)
+    ''' Calculate straight line distance between point and line to find Elbow Distance'''
+    return np.abs((a * x1 + b * y1 + c)) / np.sqrt(a ** 2 + b ** 2)
 
-def random_swap(list: list,m :int , n:int):
-    a, b =np.random.randint(0, min(len(list[m]), len(list[n])), 2)
-    temp = list[m][a]
-    list[m][a] = list[n][b]
-    list[n][b] = temp
+
+def random_swap(list: list, indexM: int, indexN: int):
+    '''Perform inplace random swap of a certain index between nested list at m and n'''
+    randInt1, randInt2 = np.random.randint(0, min(len(list[indexM]), len(list[indexN])), 2)
+    temp = list[indexM][randInt1]
+    list[indexM][randInt1] = list[indexN][randInt2]
+    list[indexN][randInt2] = temp
     return
 
-def random_swaps(groups):
+
+def random_swaps(groups: list):
+    ''' Executes 2 * length randomly selected inplace swaps from left half of
+     distributions with right half of distributions'''
     numSwaps = len(groups) * 2
     swaps = 0
     while swaps < numSwaps:
-        n = np.random.randint(0, len(groups) // 2)
-        m = np.random.randint(len(groups) // 2, len(groups))
-        random_swap(groups, m, n)
+        indexN = np.random.randint(0, len(groups) // 2)
+        indexM = np.random.randint(len(groups) // 2, len(groups))
+        random_swap(groups, indexM, indexN)
         swaps += 1
 
+
 def distribute_groups(res, group_size, rem_size):
+    '''
+    Distribute to group sizes according to a clock cycle using arg value cycles
+    '''
     n = len(res)
     diction = {}
     for i in range(len(set(res))):
@@ -49,7 +55,12 @@ def distribute_groups(res, group_size, rem_size):
         groups.append(nextGroup)
     return groups
 
+
 def find_group_size(n, min_groupsize, max_groupsize):
+    '''
+    Find the most optimal group size with least number of group members left out
+    Uses min_size as minimum acceptable group size for last group
+    '''
     group_size = -1  # if is -1, then reject some users
     rem_size = 0  # will be > 0 if not 0
     for i in range(max_groupsize, min_groupsize, -1):
@@ -60,7 +71,13 @@ def find_group_size(n, min_groupsize, max_groupsize):
             break
     return group_size, rem_size
 
+
 def kmeans_elbow(X):
+    '''
+    Perform Elbow finding algorithm for Kmeans Clustering Algorithm.
+    See more here
+    https://www.youtube.com/watch?v=_HiEJ20sQXQ&ab_channel=RANJIRAJ
+    '''
     dist_point_from_cluster_centre = []
     k = list(range(1, 11))
     for i in k:
@@ -84,7 +101,14 @@ def kmeans_elbow(X):
     res = km.predict(X)
     return res
 
+
 def kMeans(X, min_groupsize, max_groupsize):
+    '''
+    Overall Execution Algorithm
+    1. Finds a balanced group size
+    2. Seperate into groups of n clusters that best seperate the dataset of users
+    3. Perform Random Swaps on the Dataset
+    '''
     n = len(X)
     min_groupsize = 1
     group_size, rem_size = find_group_size(n, min_groupsize, max_groupsize)
@@ -95,6 +119,3 @@ def kMeans(X, min_groupsize, max_groupsize):
     print(groups)
     return groups
     # make json with
-
-
-
