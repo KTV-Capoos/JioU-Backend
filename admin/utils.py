@@ -1,5 +1,6 @@
 from typing import Callable
-from django.http import JsonResponse, HttpRequest
+
+from django.http import HttpRequest, JsonResponse
 
 
 def login_required(func: Callable[..., JsonResponse]):
