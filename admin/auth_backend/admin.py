@@ -3,8 +3,10 @@ from django.contrib.auth.admin import UserAdmin
 
 from .models import UserInfo
 
+
 # Register your models here.
 class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ('user',)
+    list_display = ("user",)
+
 
 admin.site.register(UserInfo, UserInfoAdmin)
