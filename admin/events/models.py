@@ -13,7 +13,9 @@ class Event(models.Model):
     event_time = models.TimeField()
     event_duration = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1)])
-    event_location = models.CharField(max_length=100)
+    event_location = models.CharField(max_length=100, blank=True)
+    event_price = models.PositiveBigIntegerField(
+        validators=[MinValueValidator(0)])
     event_image = models.ImageField(upload_to='images/')
 
     # Check updates
@@ -27,3 +29,35 @@ class Event(models.Model):
     def __str__(self) -> str:
         """String version of the event object"""
         return f"Event: {self.event_name} at {self.event_location}"
+
+    def toCardDict(self) -> dict:
+        """Details for carousell card"""
+        d = {
+            'event_id': self.event_id,
+            'event_name': self.event_name,
+            'event_date': self.event_date,
+            'event_time': self.event_time,
+            'event_duration': self.event_duration,
+            'event_price': self.event_price,
+        }
+        if self.event_image:
+            d['event_image'] = self.event_image.url
+        return d
+
+    def toDict(self) -> dict:
+        """Convert the event into a dictionary"""
+        d = {
+            'event_id': self.event_id,
+            'event_name': self.event_name,
+            'event_description': self.event_description,
+            'event_date': self.event_date,
+            'event_time': self.event_time,
+            'event_duration': self.event_duration,
+            'event_location': self.event_location,
+            'event_price': self.event_price,
+            'event_created_at': self.event_created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'event_updated_at': self.event_updated_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        }
+        if self.event_image:
+            d['event_image'] = self.event_image.url
+        return d
