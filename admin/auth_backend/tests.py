@@ -5,7 +5,8 @@ from django.test import TestCase
 # Create your tests here.
 class AuthTest(TestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create_user(username="admin", password="password")
+        self.user = User.objects.create_user(
+            username="admin", password="password")
 
     def test_login_success(self):
         response = self.client.post(
@@ -27,7 +28,12 @@ class AuthTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.json(), {"error": "Invalid username or password"})
+        self.assertEqual(
+            response.json(),
+            {
+                "error": "Invalid username or password"
+            }
+        )
 
     def test_logout(self):
         self.client.login(username="admin", password="password")
@@ -41,6 +47,7 @@ class AuthTest(TestCase):
             {
                 "username": "admin1",
                 "password": "password123",
+                "email": 'test@test.com',
                 "gender": "test",
                 "dob": "2000-10-06",
                 "mobile_number": "test",
@@ -63,6 +70,7 @@ class AuthTest(TestCase):
                 "username": "admin",
                 "password": "password",
                 "gender": "test",
+                "email": 'test@test.com',
                 "dob": "2000-10-06",
                 "mobile_number": "test",
                 "nok": "test",
