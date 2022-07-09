@@ -28,3 +28,5 @@ class EnumTest(TestCase):
             "Eurasian",
             Ethnicity.Others
         ) == Ethnicity.Others, "Find_name is incorrect"
+
+    
