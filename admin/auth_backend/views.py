@@ -32,6 +32,7 @@ def _add_user(
     username,
     password,
     gender,
+    email,
     dob,
     mobile_number,
     nok,
@@ -41,12 +42,15 @@ def _add_user(
     medical_conditions="",
     allergies="",
     dietary_restrictions="",
-    email="",
     **_
 ) -> JsonResponse:
     """Add a user to login"""
     try:
-        user = User.objects.create(username=username, email=email, password=password)
+        user = User.objects.create(
+            username=username,
+            email=email,
+            password=password
+        )
     except IntegrityError:
         return None
 
