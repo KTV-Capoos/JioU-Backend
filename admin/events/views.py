@@ -2,7 +2,7 @@ import datetime
 from django.http import JsonResponse
 
 from .models import Event
-from auth_backend.utils import login_required
+from utils import login_required
 
 
 
