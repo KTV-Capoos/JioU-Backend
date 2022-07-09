@@ -14,8 +14,8 @@ class Event(models.Model):
     event_duration = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1)])
     event_location = models.CharField(max_length=100, blank=True)
-    event_price = models.PositiveBigIntegerField(
-        validators=[MinValueValidator(0)])
+    event_price = models.PositiveBigIntegerField()
+    event_organizer = models.CharField(max_length=1000)
     event_image = models.ImageField(upload_to='images/')
 
     # Check updates
@@ -39,6 +39,7 @@ class Event(models.Model):
             'event_time': self.event_time,
             'event_duration': self.event_duration,
             'event_price': self.event_price,
+            'event_organizer': self.event_organizer,
         }
         if self.event_image:
             d['event_image'] = self.event_image.url
@@ -55,6 +56,7 @@ class Event(models.Model):
             'event_duration': self.event_duration,
             'event_location': self.event_location,
             'event_price': self.event_price,
+            'event_organizer': self.event_organizer,
             'event_created_at': self.event_created_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'event_updated_at': self.event_updated_at.strftime('%Y-%m-%dT%H:%M:%SZ'),
         }

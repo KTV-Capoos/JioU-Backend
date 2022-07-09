@@ -2,9 +2,12 @@ import datetime
 from django.http import JsonResponse
 
 from .models import Event
+from auth_backend.utils import login_required
+
 
 
 # Create your views here.
+@login_required
 def all_event(request):
     """Get all events"""
     future_events = Event.objects.filter(
@@ -22,6 +25,7 @@ def all_event(request):
     )
 
 
+@login_required
 def event_detail(request, event_id):
     """Get event detail"""
     try:

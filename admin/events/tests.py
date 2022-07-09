@@ -1,15 +1,18 @@
-from typing import Any
 from django.test import TestCase, Client
-from json import loads, dumps
+from django.contrib.auth.models import User
 
 from .models import Event
 
 
 # Create your tests here.
 class EventTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up the test client"""
         self.client = Client()
+        User.objects.create_user(
+            username='admin',
+            password='password'
+        )
         self.test_event1: Event = Event.objects.create(
             event_name='Test Event',
             event_description='Test description',
@@ -29,8 +32,23 @@ class EventTest(TestCase):
             event_price=1000,
         )
 
-    def test_all_events(self):
+    def login(self) -> None:
+        """Login to the server"""
+        credentials = {
+            'username': 'admin',
+            'password': 'password',
+        }
+        response = self.client.post('/auth/login/', credentials)
+        self.assertEqual(response.status_code, 200, response)
+
+    def test_all_event_no_login(self) -> None:
         """Test retrieve all events"""
+        response = self.client.get('/events/')
+        self.assertEqual(response.status_code, 401)
+
+    def test_all_events(self) -> None:
+        """Test retrieve all events"""
+        self.login()
         response = self.client.get('/events/')
         self.assertEqual(response.status_code, 200)
         expected = {'events': [
@@ -39,13 +57,25 @@ class EventTest(TestCase):
         ]}
         self.assertEqual(response.json(), expected)
 
-    def test_event_id_found(self):
+    def test_event_id_found_no_login(self) -> None:
         """Test event details"""
+        response = self.client.get('/events/1')
+        self.assertEqual(response.status_code, 401)
+
+    def test_event_id_found(self) -> None:
+        """Test event details"""
+        self.login()
         response = self.client.get('/events/1')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), self.test_event1.toDict())
 
-    def test_event_id_not_found(self):
+    def test_event_id_not_found_no_login(self) -> None:
         """Test event details"""
+        response = self.client.get('/events/33333333333')
+        self.assertEqual(response.status_code, 401)
+
+    def test_event_id_not_found(self) -> None:
+        """Test event details"""
+        self.login()
         response = self.client.get('/events/33333333333')
         self.assertEqual(response.status_code, 404)
