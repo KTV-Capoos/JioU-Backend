@@ -24,6 +24,7 @@ class AttendanceTestCase(TestCase):
             event_time="00:00:00",
             event_duration=1,
             event_location="Test location",
+            event_category="Test category",
             event_price=10000,
         )
 
@@ -35,6 +36,7 @@ class AttendanceTestCase(TestCase):
             event_time="00:00:00",
             event_duration=1,
             event_location="Test location",
+            event_category="Test category",
             event_price=10000,
         )
 
@@ -59,12 +61,14 @@ class AttendanceTestCase(TestCase):
         response = self.client.get("/attendance/my_events")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()["events"]), 1)
-        self.assertEqual(response.json()["events"][0]["event_name"], "Test Event")
+        self.assertEqual(response.json()["events"]
+                         [0]["event_name"], "Test Event")
 
     def test_add_user_participating(self: "AttendanceTestCase") -> None:
         """Test the add_user_participating view"""
         self.login()
-        response = self.client.post(f"/attendance/{self.updated_event.event_id}/join")
+        response = self.client.post(
+            f"/attendance/{self.updated_event.event_id}/join")
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["success"])
         self.assertTrue(
@@ -84,7 +88,8 @@ class AttendanceTestCase(TestCase):
     def test_add_user_to_old_event(self: "AttendanceTestCase") -> None:
         """Test the add_user_participating view"""
         self.login()
-        response = self.client.post(f"/attendance/{self.old_event.event_id}/join")
+        response = self.client.post(
+            f"/attendance/{self.old_event.event_id}/join")
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], "Event already happened")
 
@@ -95,9 +100,11 @@ class AttendanceTestCase(TestCase):
             user=self.user,
             event=self.updated_event,
         )
-        response = self.client.post(f"/attendance/{self.updated_event.event_id}/join")
+        response = self.client.post(
+            f"/attendance/{self.updated_event.event_id}/join")
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["error"], "User already participating")
+        self.assertEqual(response.json()["error"],
+                         "User already participating")
 
     def test_add_user_to_full_event(self: "AttendanceTestCase") -> None:
         """Add user to full event view"""
@@ -106,6 +113,7 @@ class AttendanceTestCase(TestCase):
             user=self.user2,
             event=self.updated_event,
         )
-        response = self.client.post(f"/attendance/{self.updated_event.event_id}/join")
+        response = self.client.post(
+            f"/attendance/{self.updated_event.event_id}/join")
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["error"], "Event is full")
