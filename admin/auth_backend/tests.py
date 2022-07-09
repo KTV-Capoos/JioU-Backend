@@ -41,6 +41,7 @@ class AuthTest(TestCase):
             {
                 "username": "admin1",
                 "password": "password123",
+                "email": 'test@test123.com',
                 "gender": "test",
                 "dob": "2000-10-06",
                 "mobile_number": "test",
@@ -61,6 +62,7 @@ class AuthTest(TestCase):
             "/auth/signup/",
             {
                 "username": "admin",
+                "email": 'test@test.com',
                 "password": "password",
                 "gender": "test",
                 "dob": "2000-10-06",
