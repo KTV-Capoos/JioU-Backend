@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "events",
     "auth_backend",
     "attendance",
+    "matchmaking",
 ]
 
 MIDDLEWARE = [
