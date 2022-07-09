@@ -132,3 +132,6 @@ dmypy.json
 # Ignore Django stuff
 migrations/
 images/
+
+# Ignore local config
+docker-compose.local.yml
