@@ -18,6 +18,7 @@ class EventTest(TestCase):
             event_duration=1,
             event_limit=10,
             event_location="Test location",
+            event_category="Test category",
             event_price=10000,
         )
         self.test_event2: Event = Event.objects.create(
@@ -27,6 +28,7 @@ class EventTest(TestCase):
             event_time="00:00:00",
             event_duration=1,
             event_location="Test location 2",
+            event_category="Test category",
             event_limit=10,
             event_price=1000,
         )
