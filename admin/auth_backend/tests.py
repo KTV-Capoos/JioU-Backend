@@ -1,31 +1,33 @@
-from django.test import TestCase
 from django.contrib.auth.models import User
+from django.test import TestCase
 
 
 # Create your tests here.
 class AuthTest(TestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create_user(
-            username="admin",
-            password="password"
-        )
+        self.user = User.objects.create_user(username="admin", password="password")
 
     def test_login_success(self):
-        response = self.client.post("/auth/login/", {
-            "username": "admin",
-            "password": "password",
-        })
+        response = self.client.post(
+            "/auth/login/",
+            {
+                "username": "admin",
+                "password": "password",
+            },
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"success": True})
 
     def test_login_fail(self):
-        response = self.client.post("/auth/login/", {
-            "username": "admin",
-            "password": "wrong",
-        })
+        response = self.client.post(
+            "/auth/login/",
+            {
+                "username": "admin",
+                "password": "wrong",
+            },
+        )
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.json(), {
-                         "error": "Invalid username or password"})
+        self.assertEqual(response.json(), {"error": "Invalid username or password"})
 
     def test_logout(self):
         self.client.login(username="admin", password="password")
@@ -49,7 +51,7 @@ class AuthTest(TestCase):
                 "medical_conditions": "medical_conditions",
                 "allergies": "allergies",
                 "dietary_restrictions": "dietary_restrictions",
-            }
+            },
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"success": True})
@@ -70,7 +72,7 @@ class AuthTest(TestCase):
                 "medical_conditions": "medical_conditions",
                 "allergies": "allergies",
                 "dietary_restrictions": "dietary_restrictions",
-            }
+            },
         )
         self.assertEqual(response.status_code, 409)
         self.assertEqual(response.json(), {"error": "Username already exists"})
