@@ -60,11 +60,7 @@ def find_group_size(n, min_groupsize, max_groupsize):
             break
     return group_size, rem_size
 
-def kNN_with_elbow(X, min_groupsize, max_groupsize):
-
-    n = len(X)
-    min_groupsize = 1
-    group_size, rem_size = find_group_size(n, min_groupsize, max_groupsize)
+def kmeans_elbow(X):
     dist_point_from_cluster_centre = []
     k = list(range(1, 11))
     for i in k:
@@ -78,16 +74,27 @@ def kNN_with_elbow(X, min_groupsize, max_groupsize):
     a = dist_point_from_cluster_centre[0] - dist_point_from_cluster_centre[-1]
     b = k[-1] - k[0]
     c = (k[0] * dist_point_from_cluster_centre[-1]) - (k[8] * dist_point_from_cluster_centre[0])
-    point_dist = np.argmax(list(map(lambda x, y: calc_distance(x, y, a, b, c), k, dist_point_from_cluster_centre )))
+    point_dist = np.argmax(list(map(lambda x, y: calc_distance(x, y, a, b, c), k, dist_point_from_cluster_centre)))
     km = KMeans(
-            n_clusters=point_dist, init="k-means++",
-            n_init=10, max_iter=300,
-            tol=1e-04, random_state=0
-        )
+        n_clusters=point_dist, init="k-means++",
+        n_init=10, max_iter=300,
+        tol=1e-04, random_state=0
+    )
     km.fit(X)
     res = km.predict(X)
+    return res
+
+def kMeans(X, min_groupsize, max_groupsize):
+    n = len(X)
+    min_groupsize = 1
+    group_size, rem_size = find_group_size(n, min_groupsize, max_groupsize)
+    res = kmeans_elbow(X)
     groups = distribute_groups(res, group_size, rem_size)
-    final_grouping = random_swaps(groups)
-    return final_grouping
+    print(groups)
+    random_swaps(groups)
+    print(groups)
+    return groups
     # make json with
+
+
 
