@@ -17,6 +17,7 @@ class Event(models.Model):
     event_price = models.PositiveBigIntegerField()
     event_organizer = models.CharField(max_length=1000)
     event_image = models.ImageField(upload_to='images/')
+    event_limit = models.PositiveIntegerField()
 
     # Check updates
     event_created_at = models.DateTimeField(auto_now_add=True)
