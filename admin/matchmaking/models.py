@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from events.models import Event
 
+
 # Create your models here.
 class EventGroup(models.Model):
     """
@@ -13,9 +14,9 @@ class EventGroup(models.Model):
 
     def toDict(self) -> dict:
         """ Convert event into a dictionary"""
-        d = {
+        return {
             "event_id": self.event,
-            "user_id" : self.user,
+            "user_id": self.user,
             "group_no": self.group_no,
         }
 
