@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import List
 import numpy as np
 
-from admin.matchmaking.knn import kMeans
+from admin.matchmaking.kmeans import kMeans
 
 from .enumerations import find_name, Ethnicity, Religion, Gender, Nationality, AgeRange
 from ..auth_backend.models import UserInfo, User
