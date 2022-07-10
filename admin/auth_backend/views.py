@@ -47,11 +47,12 @@ def _add_user(
 ) -> JsonResponse:
     """Add a user to login"""
     try:
-        user = User.objects.create(
+        user: User = User.objects.create(
             username=username,
             email=email,
-            password=password
         )
+        user.set_password(password)
+        user.save()
     except IntegrityError:
         return None
 
