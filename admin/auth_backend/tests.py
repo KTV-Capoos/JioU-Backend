@@ -62,6 +62,15 @@ class AuthTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"success": True})
+        response = self.client.post(
+            "/auth/login/",
+            {
+                "username": "admin1",
+                "password": "password123",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"success": True})
 
     def test_signup_alr_exists(self):
         response = self.client.post(
