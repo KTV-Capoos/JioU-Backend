@@ -1,7 +1,8 @@
+from utils import login_required, allow_methods
+from events.models import Event
 from .models import EventGroup
-from admin.events.models import Event
 from .knnExecution import knn_endpoint
-from admin.utils import login_required, allow_methods
+
 from django.contrib.auth.decorators import user_passes_test
 from django.http import JsonResponse
 
@@ -21,6 +22,3 @@ def run_grouping(request):
                 user=user,
             )
     return JsonResponse({"success": "Grouping complete"}, status=200)
-
-
-
