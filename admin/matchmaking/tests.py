@@ -1,13 +1,56 @@
 import random
 
 import numpy as np
-from django.test import TestCase
+from django.contrib.auth.models import User
+from django.test import TestCase, Client
 
 # Create your tests here.
 from sklearn.datasets import make_blobs
 
 from .enumerations import find_name, Ethnicity
 from .kmeans import kMeans, kmeans_elbow, random_swap, distribute_groups
+from ..events.models import Event
+
+
+class AuthTest():
+    def setUp(self) -> None:
+        self.client = Client()
+        User.objects.create_user(username="admin", password="password")
+        self.test_event1: Event = Event.objects.create(
+            event_name="Test Event",
+            event_description="Test description",
+            event_date="2023-01-01",
+            event_time="00:00:00",
+            event_duration=1,
+            event_limit=10,
+            event_location="Test location",
+            event_category="Test category",
+            event_price=10000,
+        )
+        self.test_event2: Event = Event.objects.create(
+            event_name="Test Event 2",
+            event_description="Test description 2",
+            event_date="2023-01-02",
+            event_time="00:00:00",
+            event_duration=1,
+            event_location="Test location 2",
+            event_category="Test category",
+            event_limit=10,
+            event_price=1000,
+        )
+    def login(self) -> None:
+        """Login to the server"""
+        credentials = {
+            "username": "admin",
+            "password": "password",
+        }
+        response = self.client.post("/auth/login/", credentials)
+        self.assertEqual(response.status_code, 200, response)
+
+    def test_all_event_no_login(self) -> None:
+        """Test retrieve all events"""
+        response = self.client.post()
+        self.assertEqual(response.status_code, 401)
 
 
 class KMeansTest(TestCase):
@@ -45,6 +88,8 @@ class KMeansTest(TestCase):
         rangedValues = np.arange(10)
         # wrong remain value is protected against
         self.assertEqual(len(distribute_groups(rangedValues, 1, 1)), 10)
+
+
 
 class EnumTest(TestCase):
     def test_enum_string_parse_valid(self):
