@@ -1,3 +1,4 @@
+from typing import Type
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -73,7 +74,10 @@ def _add_user(
 @allow_methods(["POST"])
 def signup(request) -> JsonResponse:
     """User Signup for django"""
-    user = _add_user(**dict(request.POST.items()))
+    try:
+        user = _add_user(**dict(request.POST.items()))
+    except TypeError:
+        return JsonResponse({"error": "Missing form values"}, status=400)
     if user is None:
         return JsonResponse({"error": "Username already exists"}, status=409)
     return JsonResponse({"success": True})
