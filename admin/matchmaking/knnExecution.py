@@ -21,7 +21,7 @@ def knn_endpoint() -> None:
         print(participants)
 
 
-def yearsago(years, from_date=None):
+def yearsago(years: int, from_date=None):
     if from_date is None:
         from_date = datetime.now()
     try:
@@ -33,7 +33,7 @@ def yearsago(years, from_date=None):
                                  year=from_date.year-years)
 
 
-def num_years(begin, end=None):
+def num_years(begin: datetime, end=None):
     if end is None:
         end = datetime.now()
     num_years = int((end - begin).days / 365.2425)
@@ -46,27 +46,7 @@ def num_years(begin, end=None):
 def response_to_vect(data: dict) -> tuple[int, list]:
     '''Assume data given is json or dict data'''
     vect = []
-    user_id = data['user_id']
-    vect.append(find_name(
-        Ethnicity,
-        data['ethnicity'],
-        Ethnicity.Others
-    ))
-    vect.append(find_name(
-        Religion,
-        data['religion'],
-        Religion.Others
-    ))
-    vect.append(find_name(
-        Gender,
-        data['gender'],
-        Gender.Others
-    ))
-    vect.append(find_name(
-        Nationality,
-        data['nationality'],
-        Nationality.Others
-    ))
+    vect = [ find_name(e, data[e.name.lower()], e.Others) for e in [Ethnicity, Religion, Gender, Nationality] ]
     # Assume this is datetime data
     vect.append(AgeRange.valueToName(yearsago(data['dob'], datetime.now())))
-    return user_id, vect
+    return data['user_id'], vect
