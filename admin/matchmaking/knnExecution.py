@@ -4,9 +4,9 @@ import numpy as np
 
 from .knn import kMeans
 from .enumerations import find_name, Ethnicity, Religion, Gender, Nationality, AgeRange
-from ..auth_backend.models import UserInfo, User
-from ..events.models import Event
-from ..attendance.models import Attendance
+from auth_backend.models import UserInfo, User
+from events.models import Event
+from attendance.models import Attendance
 
 
 def parse_user_to_format(user: User) -> dict[str, str]:
