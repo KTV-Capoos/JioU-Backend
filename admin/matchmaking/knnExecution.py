@@ -45,12 +45,12 @@ def knn_endpoint() -> List[List[int]]:
             ) for participant in event_attendance
         ]
         ids, vectors = zip(*participants)
-        userIds = np.array(ids)
+        users = np.array(ids)
         vectors = np.array(vectors)
         grouping = kMeans(vectors, 1, 5)
         finalgrouping = []
         for group in grouping:
-            finalgrouping.append(userIds[group])
+            finalgrouping.append(users[group])
 
         data[event.event_id] = finalgrouping
     return data
