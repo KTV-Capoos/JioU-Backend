@@ -53,7 +53,8 @@ def distribute_groups(res: np.array, group_size: int, rem_size: int) -> list:
             iterations += 1
             currGroup += 1
         groups.append(nextGroup)
-    return groups
+
+    return list(filter(lambda x: len(x) > 0, groups))
 
 
 def find_group_size(n: int, min_groupsize: int, max_groupsize: int) -> Tuple[int, int]:
@@ -65,35 +66,38 @@ def find_group_size(n: int, min_groupsize: int, max_groupsize: int) -> Tuple[int
     rem_size = 0  # will be > 0 if not 0
     for i in range(max_groupsize, min_groupsize, -1):
         rem_size = n % i
-        print(i, rem_size, min_groupsize)
         if rem_size >= min_groupsize:
             group_size = i
             break
     return group_size, rem_size
 
 
-def kmeans_elbow(X: np.array) -> np.array:
+def kmeans_elbow(X: np.array, max_size) -> np.array:
     '''
     Perform Elbow finding algorithm for Kmeans Clustering Algorithm.
     See more here
     https://www.youtube.com/watch?v=_HiEJ20sQXQ&ab_channel=RANJIRAJ
     '''
     dist_point_from_cluster_centre = []
-    k = list(range(1, 11))
+    if max_size > 1:
+        k = range(1, max_size)
+    else:
+        k = [1]
     for i in k:
         km = KMeans(
             n_clusters=i, init="k-means++",
             n_init=10, max_iter=300,
-            tol=1e-04, random_state=0
+            tol=1e-04
         )
         km.fit(X)
         dist_point_from_cluster_centre.append(km.inertia_)
     a = dist_point_from_cluster_centre[0] - dist_point_from_cluster_centre[-1]
     b = k[-1] - k[0]
-    c = (k[0] * dist_point_from_cluster_centre[-1]) - (k[8] * dist_point_from_cluster_centre[0])
-    point_dist = np.argmax(list(map(lambda x, y: calc_distance(x, y, a, b, c), k, dist_point_from_cluster_centre)))
+    c = (k[0] * dist_point_from_cluster_centre[-1]) - (k[-1] * dist_point_from_cluster_centre[0])
+    point_dist = np.argmax(list(map(lambda x, y: calc_distance(x, y, a, b, c), k, dist_point_from_cluster_centre)))  # add 1 to offset index error
+    print(k[point_dist])
     km = KMeans(
-        n_clusters=point_dist, init="k-means++",
+        n_clusters=k[point_dist], init="k-means++",
         n_init=10, max_iter=300,
         tol=1e-04, random_state=0
     )
@@ -112,7 +116,8 @@ def kMeans(X: np.array, min_groupsize: int, max_groupsize: int) -> List[List[int
     n = len(X)
     min_groupsize = 1
     group_size, rem_size = find_group_size(n, min_groupsize, max_groupsize)
-    res = kmeans_elbow(X)
+    print(group_size, rem_size)
+    res = kmeans_elbow(X, max_groupsize)
     groups = distribute_groups(res, group_size, rem_size)
     random_swaps(groups)
     return groups

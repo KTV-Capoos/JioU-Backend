@@ -2,8 +2,7 @@ from datetime import datetime, timedelta
 from typing import List
 import numpy as np
 
-from admin.matchmaking.kmeans import kMeans
-
+from .knn import kMeans
 from .enumerations import find_name, Ethnicity, Religion, Gender, Nationality, AgeRange
 from ..auth_backend.models import UserInfo, User
 from ..events.models import Event
@@ -13,7 +12,7 @@ from ..attendance.models import Attendance
 def parse_user_to_format(user: User) -> dict[str, str]:
     """
     Returns a dict with keys
-    - user_id
+    - user
     - ethinicity
     - religion
     - gender
@@ -22,7 +21,7 @@ def parse_user_to_format(user: User) -> dict[str, str]:
     """
     user_info: UserInfo = UserInfo.objects.filter(user=user).get()
     return {
-        'user_id': user.user_id,
+        'user_id': user,
         'ethnicity': user_info.ethnicity,
         'religion': user_info.religion,
         'gender': user_info.gender,
@@ -36,6 +35,7 @@ def knn_endpoint() -> List[List[int]]:
         event_date__lte=datetime.now().date + timedelta(days=3),
         event_date__gte=datetime.now()
     ).all()
+    data = {} 
     for event in events:
         event_attendance: List[Attendance] = Attendance.objects.filter(
             event=event).all()
@@ -45,14 +45,15 @@ def knn_endpoint() -> List[List[int]]:
             ) for participant in event_attendance
         ]
         ids, vectors = zip(*participants)
-        userIds = np.array(ids)
+        users = np.array(ids)
         vectors = np.array(vectors)
         grouping = kMeans(vectors, 1, 5)
         finalgrouping = []
         for group in grouping:
-            finalgrouping.append(userIds[group])
+            finalgrouping.append(users[group])
 
-        return finalgrouping
+        data[event.event_id] = finalgrouping
+    return data
 
 
 def yearsago(years: int, from_date=None):
@@ -91,4 +92,4 @@ def response_to_vect(data: dict) -> tuple[int, list]:
             for e in [Ethnicity, Religion, Gender, Nationality]]
     # Assume this is datetime data
     vect.append(AgeRange.valueToName(yearsago(data['dob'], datetime.now())))
-    return data['user_id'], vect
+    return data['user'], vect
