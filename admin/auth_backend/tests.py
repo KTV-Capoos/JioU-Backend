@@ -46,6 +46,7 @@ class AuthTest(TestCase):
             "/auth/signup/",
             {
                 "username": "admin1",
+                "full_name": "administrator",
                 "password": "password123",
                 "email": 'test@test.com',
                 "gender": "test",
@@ -77,6 +78,7 @@ class AuthTest(TestCase):
             "/auth/signup/",
             {
                 "username": "admin",
+                "full_name": "administrator",
                 "password": "password",
                 "gender": "test",
                 "email": 'test@test.com',
