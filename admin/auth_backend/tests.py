@@ -48,7 +48,7 @@ class AuthTest(TestCase):
                 "username": "admin1",
                 "full_name": "administrator",
                 "password": "password123",
-                "email": 'test@test.com',
+                "email": 'test@test123.com',
                 "gender": "test",
                 "dob": "2000-10-06",
                 "mobile_number": "test",

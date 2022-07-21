@@ -135,3 +135,6 @@ images/
 
 # Ignore local config
 docker-compose.local.yml
+.idea/
+Pipfile*
+*.ipynb
