@@ -1,7 +1,7 @@
 from utils import login_required, allow_methods
 from events.models import Event
 from .models import EventGroup
-from .knnExecution import knn_endpoint
+from .kmeansExecution import knn_endpoint
 
 from django.contrib.auth.decorators import user_passes_test
 from django.http import JsonResponse

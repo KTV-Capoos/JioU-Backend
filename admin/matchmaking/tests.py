@@ -1,4 +1,6 @@
+from datetime import datetime, timedelta
 import random
+from urllib import response
 
 import numpy as np
 from django.contrib.auth.models import User
@@ -6,20 +8,50 @@ from django.test import TestCase, Client
 
 # Create your tests here.
 from sklearn.datasets import make_blobs
+from auth_backend.models import UserInfo
+
+from attendance.models import Attendance
+
+from .models import EventGroup
 
 from .enumerations import find_name, Ethnicity
 from .kmeans import kMeans, kmeans_elbow, random_swap, distribute_groups
-from ..events.models import Event
+from events.models import Event
 
 
-class AuthTest():
+class AuthTest(TestCase):
     def setUp(self) -> None:
         self.client = Client()
-        User.objects.create_user(username="admin", password="password")
+        response = self.client.post(
+            "/auth/signup/",
+            {
+                "username": "admin1",
+                "password": "password123",
+                "email": 'test@test123.com',
+                "gender": "test",
+                "dob": "2000-10-06",
+                "mobile_number": "test",
+                "nok": "test",
+                "religion": "test",
+                "nationality": "test",
+                "ethnicity": "test",
+                "medical_conditions": "medical_conditions",
+                "allergies": "allergies",
+                "dietary_restrictions": "dietary_restrictions",
+            }
+            )
+        self.superuser = User.objects.create(
+            username="admin",
+            is_superuser=True
+        )
+        self.superuser.set_password("123456")
+        self.superuser.save()
+        self.user = User.objects.filter(username="admin1").get()
+
         self.test_event1: Event = Event.objects.create(
             event_name="Test Event",
             event_description="Test description",
-            event_date="2023-01-01",
+            event_date=(datetime.now().date() + timedelta(days=2)),
             event_time="00:00:00",
             event_duration=1,
             event_limit=10,
@@ -30,7 +62,7 @@ class AuthTest():
         self.test_event2: Event = Event.objects.create(
             event_name="Test Event 2",
             event_description="Test description 2",
-            event_date="2023-01-02",
+            event_date="2022-07-12",
             event_time="00:00:00",
             event_duration=1,
             event_location="Test location 2",
@@ -38,20 +70,39 @@ class AuthTest():
             event_limit=10,
             event_price=1000,
         )
-    def login(self) -> None:
-        """Login to the server"""
+        Attendance.objects.create(
+            event=self.test_event1,
+            user=self.user
+        )
+    def super_login(self) -> None:
         credentials = {
-            "username": "admin",
-            "password": "password",
+            "username":"admin",
+            "password":"123456"
         }
         response = self.client.post("/auth/login/", credentials)
         self.assertEqual(response.status_code, 200, response)
 
-    def test_all_event_no_login(self) -> None:
-        """Test retrieve all events"""
-        response = self.client.post()
-        self.assertEqual(response.status_code, 401)
+    def login(self) -> None:
+        """Login to the server"""
+        credentials = {
+            "username": "admin1",
+            "password": "password123",
+        }
+        response = self.client.post("/auth/login/", credentials)
+        self.assertEqual(response.status_code, 200, response)
 
+    def test_post_userMatching(self) -> None:
+        """Test retrieve all events"""
+        self.super_login()
+        response = self.client.post("/matchmaking/",{})
+        self.assertEqual(response.status_code, 200)
+
+        expected ={'success': 'Grouping complete'}
+        self.assertEqual(response.json(), expected)
+        
+        self.assertEqual(EventGroup.objects.filter(
+         user= self.user, event = self.test_event1
+        ).exists(), "hi")
 
 class KMeansTest(TestCase):
     def setUp(self) -> None:
@@ -88,7 +139,6 @@ class KMeansTest(TestCase):
         rangedValues = np.arange(10)
         # wrong remain value is protected against
         self.assertEqual(len(distribute_groups(rangedValues, 1, 1)), 10)
-
 
 
 class EnumTest(TestCase):
