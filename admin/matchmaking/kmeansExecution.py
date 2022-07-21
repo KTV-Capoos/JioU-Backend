@@ -76,9 +76,9 @@ def yearsago(years: int, from_date=None):
                                  year=from_date.year()-int(years))
 
 
-def num_years(begin: datetime, end=None):
+def num_years(begin: date, end=None):
     if end is None:
-        end = date.now()
+        end = date.today()
     num_years = int((end - begin).days / 365.2425)
     if begin.year > yearsago(num_years, end):
         return num_years - 1
