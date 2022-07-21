@@ -1,10 +1,11 @@
+from typing import Type
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import JsonResponse
-from utils import allow_methods
 
 from .models import UserInfo
+from utils import allow_methods, login_required
 
 
 # Create your views here.
@@ -30,15 +31,16 @@ def logout_request(request) -> JsonResponse:
 
 def _add_user(
     username,
+    full_name,
     password,
     gender,
     email,
     dob,
     mobile_number,
-    nok,
     religion,
     nationality,
     ethnicity,
+    nok="",
     medical_conditions="",
     allergies="",
     dietary_restrictions="",
@@ -46,11 +48,12 @@ def _add_user(
 ) -> JsonResponse:
     """Add a user to login"""
     try:
-        user = User.objects.create(
+        user: User = User.objects.create(
             username=username,
             email=email,
-            password=password
         )
+        user.set_password(password)
+        user.save()
     except IntegrityError:
         return None
 
@@ -66,6 +69,7 @@ def _add_user(
         medical_conditions=medical_conditions,
         allergies=allergies,
         dietary_restrictions=dietary_restrictions,
+        full_name=full_name,
     )
     return user
 
@@ -73,7 +77,19 @@ def _add_user(
 @allow_methods(["POST"])
 def signup(request) -> JsonResponse:
     """User Signup for django"""
-    user = _add_user(**dict(request.POST.items()))
+    try:
+        user = _add_user(**dict(request.POST.items()))
+    except TypeError:
+        return JsonResponse({"error": "Missing form values"}, status=400)
     if user is None:
         return JsonResponse({"error": "Username already exists"}, status=409)
     return JsonResponse({"success": True})
+
+
+@login_required
+@allow_methods(["GET"])
+def get_info(request) -> JsonResponse:
+    """Get user info"""
+    user = request.user
+    user_info = UserInfo.objects.get(user=user)
+    return JsonResponse(user_info.to_dict())

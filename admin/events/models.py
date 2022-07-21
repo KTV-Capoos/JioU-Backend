@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.conf import settings
 
 
 # Create your models here.
@@ -16,7 +17,7 @@ class Event(models.Model):
     event_location = models.CharField(max_length=100, blank=True)
     event_price = models.PositiveBigIntegerField()
     event_organizer = models.CharField(max_length=1000)
-    event_image = models.ImageField(upload_to="images/")
+    event_image = models.ImageField(upload_to=settings.MEDIA_ROOT)
     event_limit = models.PositiveIntegerField()
     event_category = models.CharField(max_length=100)
 
@@ -41,6 +42,7 @@ class Event(models.Model):
             "event_time": self.event_time,
             "event_duration": self.event_duration,
             "event_price": self.event_price,
+            "event_location": self.event_location,
         }
         if self.event_image:
             d["event_image"] = self.event_image.url
